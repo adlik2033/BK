@@ -1,5 +1,6 @@
 ﻿namespace BK.Models.DTO
 {
+#pragma warning disable
     public class AuthResponse
     {
         public bool Success { get; set; }
@@ -18,3 +19,4 @@
         public string RoleName { get; set; }
     }
 }
+#pragma warning enable
