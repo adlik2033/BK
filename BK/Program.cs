@@ -1,5 +1,6 @@
 
 using BK.Models;
+using BK.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace BK
@@ -18,8 +19,13 @@ namespace BK
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddDbContext<BKDbContext>(options =>
-            options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection")));
+             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection")));
 
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+            builder.Services.AddScoped<ICouponRepository, CouponRepository>();
+            builder.Services.AddScoped<IItemRepository, ItemRepository>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddEndpointsApiExplorer();
             var app = builder.Build();
 
 
