@@ -14,11 +14,4 @@
         public string? Description { get; set; }
         // Не включаем Items при создании - товары добавляются отдельно
     }
-
-    public class CategorySimpleDTO
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = null!;
-        public string? Description { get; set; }
-    }
 }

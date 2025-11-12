@@ -1,12 +1,9 @@
 ﻿namespace BK.Models.DTO
 {
-    public class ItemDTO
+    public class CategorySimpleDTO
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string? Description { get; set; }
-        public decimal Price { get; set; }
-        public int CategoryId { get; set; }
-        public CategorySimpleDTO Category { get; set; } = null!;
     }
 }

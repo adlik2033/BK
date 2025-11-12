@@ -30,7 +30,7 @@ namespace BK.Controllers
                 {
                     Id = i.Id,
                     Name = i.Name,
-                    Description = i.Descriprion,
+                    Description = i.Description,
                     Price = i.Price
                 }).ToList()
             }).ToList();
@@ -58,7 +58,7 @@ namespace BK.Controllers
                 {
                     Id = i.Id,
                     Name = i.Name,
-                    Description = i.Descriprion,
+                    Description = i.Description,
                     Price = i.Price
                 }).ToList()
             };
@@ -80,7 +80,7 @@ namespace BK.Controllers
                 {
                     Id = i.Id,
                     Name = i.Name,
-                    Description = i.Descriprion,
+                    Description = i.Description,
                     Price = i.Price
                 }).ToList()
             }).ToList();

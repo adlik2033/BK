@@ -57,9 +57,9 @@ namespace BK.Repositories
 
         public User UpdateUser(int id, User user)
         {
-            var userr = _context.Users.FirstOrDefault(u =>
+            var user1 = _context.Users.FirstOrDefault(u =>
             u.Id == id);
-            if (userr != null)
+            if (user1 != null)
             {
                 _context.Users.Update(user);
                 _context.SaveChanges();

@@ -14,6 +14,12 @@ namespace BK.Repositories
 
         public Item Create(Item entity)
         {
+            // Загружаем категорию по CategoryId для корректного маппинга
+            if (entity.CategoryId > 0 && entity.Category == null)
+            {
+                entity.Category = _context.Categories.Find(entity.CategoryId);
+            }
+
             _context.Items.Add(entity);
             _context.SaveChanges();
             return entity;
@@ -40,6 +46,7 @@ namespace BK.Repositories
         {
             return _context.Items
                 .Include(i => i.Category)
+                .Where(i => i.IsActive)
                 .ToList();
         }
 
@@ -60,6 +67,12 @@ namespace BK.Repositories
 
         public Item Update(Item entity)
         {
+            // Загружаем категорию по CategoryId для корректного маппинга
+            if (entity.CategoryId > 0 && entity.Category == null)
+            {
+                entity.Category = _context.Categories.Find(entity.CategoryId);
+            }
+
             _context.Items.Update(entity);
             _context.SaveChanges();
             return entity;

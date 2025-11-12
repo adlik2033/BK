@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using BK.Models;
+﻿using BK.Models;
 using BK.Models.DTO;
 using BK.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +10,12 @@ namespace BK.Controllers
     public class ItemsController : ControllerBase
     {
         private readonly IItemRepository _itemRepository;
-        private readonly IMapper _mapper;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public ItemsController(IItemRepository itemRepository, IMapper mapper)
+        public ItemsController(IItemRepository itemRepository, ICategoryRepository categoryRepository)
         {
             _itemRepository = itemRepository;
-            _mapper = mapper;
+            _categoryRepository = categoryRepository;
         }
 
         // GET: api/items
@@ -24,7 +23,21 @@ namespace BK.Controllers
         public ActionResult<IEnumerable<ItemDTO>> GetItems()
         {
             var items = _itemRepository.GetAll();
-            var itemDTOs = _mapper.Map<IEnumerable<ItemDTO>>(items);
+            var itemDTOs = items.Select(item => new ItemDTO
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description, // Используем свойство из модели
+                Price = item.Price,
+                CategoryId = item.CategoryId,
+                Category = new CategorySimpleDTO
+                {
+                    Id = item.Category.Id,
+                    Name = item.Category.Name,
+                    Description = item.Category.Description
+                }
+            }).ToList();
+
             return Ok(itemDTOs);
         }
 
@@ -39,17 +52,22 @@ namespace BK.Controllers
                 return NotFound();
             }
 
-            var itemDTO = _mapper.Map<ItemDTO>(item);
-            return Ok(itemDTO);
-        }
+            var itemDTO = new ItemDTO
+            {
+                Id = item.Id,
+                Name = item.Name,
+                Description = item.Description,
+                Price = item.Price,
+                CategoryId = item.CategoryId,
+                Category = new CategorySimpleDTO
+                {
+                    Id = item.Category.Id,
+                    Name = item.Category.Name,
+                    Description = item.Category.Description
+                }
+            };
 
-        // GET: api/items/category/5
-        [HttpGet("category/{categoryId}")]
-        public ActionResult<IEnumerable<ItemDTO>> GetItemsByCategory(int categoryId)
-        {
-            var items = _itemRepository.GetByCategoryId(categoryId);
-            var itemDTOs = _mapper.Map<IEnumerable<ItemDTO>>(items);
-            return Ok(itemDTOs);
+            return Ok(itemDTO);
         }
 
         // POST: api/items
@@ -61,9 +79,39 @@ namespace BK.Controllers
                 return BadRequest(ModelState);
             }
 
-            var item = _mapper.Map<Item>(createItemDTO);
+            // Проверяем существование категории
+            if (!_categoryRepository.Exists(createItemDTO.CategoryId))
+            {
+                return BadRequest($"Category with ID {createItemDTO.CategoryId} does not exist.");
+            }
+
+            var item = new Item
+            {
+                Name = createItemDTO.Name,
+                Description = createItemDTO.Description,
+                Price = createItemDTO.Price,
+                CategoryId = createItemDTO.CategoryId,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdateAt = DateTime.UtcNow
+            };
+
             var createdItem = _itemRepository.Create(item);
-            var itemDTO = _mapper.Map<ItemDTO>(createdItem);
+
+            var itemDTO = new ItemDTO
+            {
+                Id = createdItem.Id,
+                Name = createdItem.Name,
+                Description = createdItem.Description,
+                Price = createdItem.Price,
+                CategoryId = createdItem.CategoryId,
+                Category = new CategorySimpleDTO
+                {
+                    Id = createdItem.Category.Id,
+                    Name = createdItem.Category.Name,
+                    Description = createdItem.Category.Description
+                }
+            };
 
             return CreatedAtAction(nameof(GetItem), new { id = itemDTO.Id }, itemDTO);
         }
@@ -82,14 +130,24 @@ namespace BK.Controllers
                 return NotFound();
             }
 
-            ArgumentNullException.ThrowIfNull(updateItemDTO);
+            // Проверяем существование категории
+            if (!_categoryRepository.Exists(updateItemDTO.CategoryId))
+            {
+                return BadRequest($"Category with ID {updateItemDTO.CategoryId} does not exist.");
+            }
+
             var existingItem = _itemRepository.GetById(id);
             if (existingItem == null)
             {
                 return NotFound();
             }
 
-            _mapper.Map(updateItemDTO, existingItem);
+            existingItem.Name = updateItemDTO.Name;
+            existingItem.Description = updateItemDTO.Description;
+            existingItem.Price = updateItemDTO.Price;
+            existingItem.CategoryId = updateItemDTO.CategoryId;
+            existingItem.UpdateAt = DateTime.UtcNow;
+
             _itemRepository.Update(existingItem);
 
             return NoContent();

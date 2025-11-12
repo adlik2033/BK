@@ -42,28 +42,32 @@ namespace BK.Mappings
                 .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.items, opt => opt.MapFrom(src => src.items));
 
+            // Маппинг для Item
             CreateMap<Item, ItemDTO>()
-    .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Descriprion)) // если исправили опечатку, то убрать эту строку и использовать правильное название
-    .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name));
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description)) // Маппинг опечатки
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category));
 
             CreateMap<CreateItemDTO, Item>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.Descriprion, opt => opt.MapFrom(src => src.Description)) // если в модели опечатка, то здесь тоже нужно использовать опечатку, но лучше исправить в модели
-                .ForMember(dest => dest.Category, opt => opt.Ignore()) // мы не маппим Category из CreateItemDTO, т.к. там только CategoryId
-                .AfterMap((src, dest) => {
-                    // Устанавливаем CategoryId, но Category будет загружено при сохранении или через репозиторий
-                    dest.CategoryId = src.CategoryId;
-                });
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Category, opt => opt.Ignore()); // Игнорируем, т.к. будет загружена по CategoryId
 
             CreateMap<UpdateItemDTO, Item>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.Descriprion, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.Category, opt => opt.Ignore()); // Игнорируем, т.к. будет загружена по CategoryId
+            CreateMap<UpdateItemDTO, Item>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdateAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.Category, opt => opt.Ignore())
                 .AfterMap((src, dest) => {
                     dest.CategoryId = src.CategoryId;
