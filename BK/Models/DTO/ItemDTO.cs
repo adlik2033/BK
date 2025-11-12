@@ -1,12 +1,9 @@
-﻿namespace BK.Models.DTO
+﻿public class ItemDTO
 {
-    public class ItemDTO
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = null!; // не может быть нуллейбл
-        public string? Descriprion { get; set; } // описание
-        public decimal Price { get; set; }
-        public int CategoryId { get; set; } // внешний ключ зависимости сущностей
-        public Category Category { get; set; } = null!; // навигационное свойство
-    }
+    public int Id { get; set; }
+    public string Name { get; set; } = null!;
+    public string? Description { get; set; }
+    public decimal Price { get; set; }
+    public int CategoryId { get; set; }
+    public string CategoryName { get; set; } = null!; // только имя категории
 }

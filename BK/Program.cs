@@ -1,7 +1,9 @@
-
+using AutoMapper;
+using BK.Mappings;
 using BK.Models;
 using BK.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace BK
 {
@@ -20,14 +22,19 @@ namespace BK
 
             builder.Services.AddDbContext<BKDbContext>(options =>
              options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection")));
+            // Добавьте эту строку после builder.Services.AddControllers();
+
+            // Регистрация репозиториев
+            builder.Services.AddScoped<IItemRepository, ItemRepository>();
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICouponRepository, CouponRepository>();
             builder.Services.AddScoped<IItemRepository, ItemRepository>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<IItemRepository, ItemRepository>();
             builder.Services.AddEndpointsApiExplorer();
             var app = builder.Build();
-
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

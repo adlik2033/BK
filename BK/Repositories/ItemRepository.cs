@@ -6,10 +6,12 @@ namespace BK.Repositories
     public class ItemRepository : IItemRepository
     {
         private readonly BKDbContext _context;
-        public ItemRepository(BKDbContext bKDbContext)
+
+        public ItemRepository(BKDbContext context)
         {
-            _context = bKDbContext;
+            _context = context;
         }
+
         public Item Create(Item entity)
         {
             _context.Items.Add(entity);
@@ -36,13 +38,24 @@ namespace BK.Repositories
 
         public IEnumerable<Item> GetAll()
         {
-            return _context.Items.ToList();
+            return _context.Items
+                .Include(i => i.Category)
+                .ToList();
         }
 
         public Item GetById(int id)
         {
-            var item = _context.Items.FirstOrDefault(x => x.Id == id);
-            return item;
+            return _context.Items
+                .Include(i => i.Category)
+                .FirstOrDefault(x => x.Id == id);
+        }
+
+        public IEnumerable<Item> GetByCategoryId(int categoryId)
+        {
+            return _context.Items
+                .Include(i => i.Category)
+                .Where(x => x.CategoryId == categoryId && x.IsActive)
+                .ToList();
         }
 
         public Item Update(Item entity)

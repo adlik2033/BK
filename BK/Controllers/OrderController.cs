@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using BK.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BK.Controllers
@@ -7,6 +9,13 @@ namespace BK.Controllers
     [ApiController]
     public class OrderController : ControllerBase
     {
-        // пока нет реализации
+        private readonly BKDbContext _dbContext;
+        private readonly IMapper _mapper;
+
+        public OrderController(BKDbContext dbContext, IMapper mapper)
+        {
+            _mapper = mapper;
+            _dbContext = dbContext;
+        }
     }
 }
