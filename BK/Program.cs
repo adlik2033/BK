@@ -24,10 +24,6 @@ namespace BK
              options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection")));
             // Добавьте эту строку после builder.Services.AddControllers();
 
-            // Регистрация репозиториев
-            builder.Services.AddScoped<IItemRepository, ItemRepository>();
-            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICouponRepository, CouponRepository>();
             builder.Services.AddScoped<IItemRepository, ItemRepository>();

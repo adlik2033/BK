@@ -7,6 +7,6 @@ namespace BK.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        // пока нет реализации
+     
     }
 }

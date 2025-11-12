@@ -7,6 +7,6 @@ namespace BK.Controllers
     [ApiController]
     public class CouponController : ControllerBase
     {
-        // пока нет реализации
+        // пока нет реал
     }
 }

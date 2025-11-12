@@ -6,10 +6,12 @@ namespace BK.Repositories
     public class CategoryRepository : ICategoryRepository
     {
         private readonly BKDbContext _context;
+
         public CategoryRepository(BKDbContext bKDbContext)
         {
             _context = bKDbContext;
         }
+
         public Category Create(Category entity)
         {
             _context.Categories.Add(entity);
@@ -36,13 +38,16 @@ namespace BK.Repositories
 
         public IEnumerable<Category> GetAll()
         {
-            return _context.Categories.ToList();
+            return _context.Categories
+                .Include(c => c.Items) // Включаем Items для маппинга
+                .ToList();
         }
 
         public Category GetById(int id)
         {
-            var category = _context.Categories.FirstOrDefault(x => x.Id == id);
-            return category;
+            return _context.Categories
+                .Include(c => c.Items) // Включаем Items для маппинга
+                .FirstOrDefault(x => x.Id == id);
         }
 
         public Category Update(Category entity)
@@ -50,6 +55,15 @@ namespace BK.Repositories
             _context.Categories.Update(entity);
             _context.SaveChanges();
             return entity;
+        }
+
+        // Дополнительный метод для получения активных категорий
+        public IEnumerable<Category> GetActiveCategories()
+        {
+            return _context.Categories
+                .Include(c => c.Items)
+                .Where(c => c.IsActive)
+                .ToList();
         }
     }
 }

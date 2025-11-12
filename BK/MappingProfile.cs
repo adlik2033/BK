@@ -10,7 +10,7 @@ namespace BK.Mappings
         {
             // Маппинг для Category
             CreateMap<Category, CategoryDTO>();
-            CreateMap<CreateCategotyDTO, Category>()
+            CreateMap<CreateCategoryDTO, Category>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
@@ -44,7 +44,7 @@ namespace BK.Mappings
 
             CreateMap<Item, ItemDTO>()
     .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Descriprion)) // если исправили опечатку, то убрать эту строку и использовать правильное название
-    .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+    .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category.Name));
 
             CreateMap<CreateItemDTO, Item>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
