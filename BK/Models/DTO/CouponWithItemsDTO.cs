@@ -1,6 +1,6 @@
 ﻿namespace BK.Models.DTO
 {
-    public class CouponDTO
+    public class CouponWithItemsDTO
     {
         public int Id { get; set; }
         public string Code { get; set; } = null!;
@@ -12,5 +12,6 @@
         public int UsageLimit { get; set; }
         public int UsageCount { get; set; }
         public bool IsActive { get; set; }
+        public List<ItemDTO> Items { get; set; } = new(); // Полная информация с Items
     }
-}
+    }

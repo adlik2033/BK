@@ -20,32 +20,32 @@ namespace BK.Mappings
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.UpdateAt, opt => opt.Ignore());
 
-            // Маппинг для Coupon
-            CreateMap<Coupon, CouponDTO>()
-                .ForMember(dest => dest.items, opt => opt.MapFrom(src => src.items));
+            // Coupon to CouponDTO (без items)
+            CreateMap<Coupon, CouponDTO>();
+
+            // Coupon to CouponWithItemsDTO (с items)
+            CreateMap<Coupon, CouponWithItemsDTO>()
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.items));
+
+            // CreateCouponDTO to Coupon
             CreateMap<CreateCouponDTO, Coupon>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.items, opt => opt.MapFrom(src => src.items));
+                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.items, opt => opt.Ignore());
+
+            // UpdateCouponDTO to Coupon
             CreateMap<UpdateCouponDTO, Coupon>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.IsActive, opt => opt.Ignore())
-                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.UsageLimit, opt => opt.Ignore())
-                .ForMember(dest => dest.items, opt => opt.MapFrom(src => src.items));
-            CreateMap<CouponDTO, Coupon>()
                 .ForMember(dest => dest.IsActive, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.items, opt => opt.MapFrom(src => src.items));
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.items, opt => opt.Ignore());
 
-            // Маппинг для Item
-            CreateMap<Item, ItemDTO>()
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description)) // Маппинг опечатки
-                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category));
+            // Item to ItemDTO
+            CreateMap<Item, ItemDTO>();
 
             CreateMap<CreateItemDTO, Item>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

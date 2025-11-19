@@ -1,4 +1,5 @@
 ﻿using BK.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BK.Repositories
 {
@@ -49,6 +50,109 @@ namespace BK.Repositories
             _context.Coupons.Update(entity);
             _context.SaveChanges();
             return entity;
+        }
+
+
+        public Coupon GetByCode(string code)
+        {
+            return _context.Coupons.FirstOrDefault(x => x.Code == code);
+        }
+
+        public IEnumerable<Coupon> GetActiveCoupons()
+        {
+            var now = DateTime.UtcNow;
+            return _context.Coupons
+                .Where(x => x.IsActive &&
+                           x.ValidFrom <= now &&
+                           x.ValidUntil >= now &&
+                           x.UsageCount < x.UsageLimit)
+                .ToList();
+        }
+        public Coupon GetByIdWithItems(int id)
+        {
+            return _context.Coupons
+                .Include(c => c.items)
+                .FirstOrDefault(x => x.Id == id);
+        }
+
+        public bool AddItemsToCoupon(int couponId, List<int> itemIds)
+        {
+            try
+            {
+                var coupon = _context.Coupons
+                    .Include(c => c.items)
+                    .FirstOrDefault(c => c.Id == couponId);
+
+                if (coupon == null) return false;
+
+                var itemsToAdd = _context.Items
+                    .Where(i => itemIds.Contains(i.Id))
+                    .ToList();
+
+                foreach (var item in itemsToAdd)
+                {
+                    if (!coupon.items.Any(i => i.Id == item.Id))
+                    {
+                        coupon.items.Add(item);
+                    }
+                }
+
+                coupon.UpdatedAt = DateTime.UtcNow;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool RemoveAllItemsFromCoupon(int couponId)
+        {
+            try
+            {
+                var coupon = _context.Coupons
+                    .Include(c => c.items)
+                    .FirstOrDefault(c => c.Id == couponId);
+
+                if (coupon == null) return false;
+
+                coupon.items.Clear();
+                coupon.UpdatedAt = DateTime.UtcNow;
+                _context.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool RemoveItemFromCoupon(int couponId, int itemId)
+        {
+            try
+            {
+                var coupon = _context.Coupons
+                    .Include(c => c.items)
+                    .FirstOrDefault(c => c.Id == couponId);
+
+                if (coupon == null) return false;
+
+                var itemToRemove = coupon.items.FirstOrDefault(i => i.Id == itemId);
+                if (itemToRemove != null)
+                {
+                    coupon.items.Remove(itemToRemove);
+                    coupon.UpdatedAt = DateTime.UtcNow;
+                    _context.SaveChanges();
+                    return true;
+                }
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
