@@ -116,7 +116,6 @@ namespace BK.Controllers
             return CreatedAtAction(nameof(GetCategory), new { id = categoryDTO.Id }, categoryDTO);
         }
 
-        // PUT: api/categories/5
         [HttpPut("{id}")]
         public IActionResult UpdateCategory(int id, CategorySimpleDTO categorySimpleDTO)
         {

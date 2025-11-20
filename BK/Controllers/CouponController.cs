@@ -33,8 +33,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting all coupons");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Ошибка получения купонов");
+                return StatusCode(500, "Ошибка сервера");
             }
         }
 
@@ -45,7 +45,7 @@ namespace BK.Controllers
             {
                 if (!_couponRepository.Exists(id))
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound($"Купон с таким ID не существует!");
                 }
 
                 var coupon = _couponRepository.GetById(id);
@@ -54,8 +54,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting coupon with ID {CouponId}", id);
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Такой купон не найден {id}", id);
+                return StatusCode(500, "Ошибка сервера");
             }
         }
 
@@ -66,13 +66,13 @@ namespace BK.Controllers
             {
                 if (!_couponRepository.Exists(id))
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound("Такой купон не найден");
                 }
 
                 var coupon = _couponRepository.GetByIdWithItems(id);
                 if (coupon == null)
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound("Такой купон не найден");
                 }
 
                 var couponDTO = _mapper.Map<CouponWithItemsDTO>(coupon);
@@ -80,8 +80,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting coupon with items with ID {CouponId}", id);
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Ошибка получения айтемов с купоном {id}", id);
+                return StatusCode(500, "Ошибка сервера");
             }
         }
         [HttpPost]
@@ -105,7 +105,7 @@ namespace BK.Controllers
                 coupon.IsActive = true;
                 coupon.CreatedAt = DateTime.UtcNow;
                 coupon.UpdatedAt = DateTime.UtcNow;
-                coupon.items = new List<Item>(); // Инициализируем пустой список
+                coupon.items = new List<Item>(); 
 
                 var createdCoupon = _couponRepository.Create(coupon);
                 var couponDTO = _mapper.Map<CouponDTO>(createdCoupon);
@@ -114,8 +114,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while creating coupon");
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Ошибка создания купона");
+                return StatusCode(500, "Ошибка сервера");
             }
         }
 
@@ -131,13 +131,13 @@ namespace BK.Controllers
 
                 if (!_couponRepository.Exists(id))
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound($"Купон с {id} не найден");
                 }
 
                 var existingCoupon = _couponRepository.GetById(id);
                 if (existingCoupon == null)
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound($"Купон с {id} не найден");
                 }
 
                 var validationResult = ValidateCouponUpdate(updateCouponDTO, existingCoupon);
@@ -161,8 +161,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while updating coupon with ID {CouponId}", id);
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Ошибка обновления купона с {id}", id);
+                return StatusCode(500, "Ошибка сервера");
             }
         }
 
@@ -174,13 +174,13 @@ namespace BK.Controllers
             {
                 if (!_couponRepository.Exists(id))
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound($"Купон с {id} не найден");
                 }
 
                 var result = _couponRepository.AddItemsToCoupon(id, addItemsDTO.ItemIds);
                 if (!result)
                 {
-                    return BadRequest("Failed to add items to coupon");
+                    return BadRequest("Ошибка добавления купона");
                 }
 
                 var coupon = _couponRepository.GetByIdWithItems(id);
@@ -190,8 +190,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while adding items to coupon with ID {CouponId}", id);
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Ошибка получения айтемов с купоном {id}", id);
+                return StatusCode(500, "Ошибка сервера");
             }
         }
 
@@ -202,13 +202,13 @@ namespace BK.Controllers
             {
                 if (!_couponRepository.Exists(id))
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound($"Купон с {id} не найден");
                 }
 
                 var result = _couponRepository.RemoveAllItemsFromCoupon(id);
                 if (!result)
                 {
-                    return BadRequest("Failed to remove items from coupon");
+                    return BadRequest("Ошибка удаления купона!");
                 }
 
                 var coupon = _couponRepository.GetByIdWithItems(id);
@@ -218,8 +218,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while removing items from coupon with ID {CouponId}", id);
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Ошибка удаления айтемов с купона {id}", id);
+                return StatusCode(500, "Ошибка сервера");
             }
         }
 
@@ -230,13 +230,13 @@ namespace BK.Controllers
             {
                 if (!_couponRepository.Exists(id))
                 {
-                    return NotFound($"Coupon with ID {id} not found");
+                    return NotFound($"Такой купон не найден {id}");
                 }
 
                 var result = _couponRepository.RemoveItemFromCoupon(id, itemId);
                 if (!result)
                 {
-                    return BadRequest("Failed to remove item from coupon");
+                    return BadRequest("Ошибка удаления купона");
                 }
 
                 var coupon = _couponRepository.GetByIdWithItems(id);
@@ -246,8 +246,8 @@ namespace BK.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while removing item from coupon with ID {CouponId}", id);
-                return StatusCode(500, "Internal server error");
+                _logger.LogError(ex, "Ошибка удаления айтемов с купона {CouponId}", id);
+                return StatusCode(500, "Ошибка сервера");
             }
         }
 
