@@ -18,7 +18,7 @@ namespace BK.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        // GET: api/items
+
         [HttpGet]
         public ActionResult<IEnumerable<ItemDTO>> GetItems()
         {
