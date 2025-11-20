@@ -16,7 +16,6 @@ namespace BK.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        // GET: api/categories
         [HttpGet]
         public ActionResult<IEnumerable<CategoryDTO>> GetCategories()
         {
@@ -38,7 +37,6 @@ namespace BK.Controllers
             return Ok(categoryDTOs);
         }
 
-        // GET: api/categories/5
         [HttpGet("{id}")]
         public ActionResult<CategoryDTO> GetCategory(int id)
         {
@@ -66,7 +64,6 @@ namespace BK.Controllers
             return Ok(categoryDTO);
         }
 
-        // GET: api/categories/active
         [HttpGet("active")]
         public ActionResult<IEnumerable<CategoryDTO>> GetActiveCategories()
         {
@@ -88,7 +85,6 @@ namespace BK.Controllers
             return Ok(categoryDTOs);
         }
 
-        // POST: api/categories
         [HttpPost]
         public ActionResult<CategoryDTO> CreateCategory(CreateCategoryDTO createCategoryDTO)
         {
@@ -145,7 +141,6 @@ namespace BK.Controllers
                 return NotFound();
             }
 
-            // Обновляем только основные поля, не трогаем Items
             existingCategory.Name = categorySimpleDTO.Name;
             existingCategory.Description = categorySimpleDTO.Description;
             existingCategory.UpdateAt = DateTime.UtcNow;
@@ -155,7 +150,6 @@ namespace BK.Controllers
             return NoContent();
         }
 
-        // PATCH: api/categories/5/toggle
         [HttpPatch("{id}/toggle")]
         public IActionResult ToggleCategory(int id)
         {
@@ -178,7 +172,6 @@ namespace BK.Controllers
             return NoContent();
         }
 
-        // DELETE: api/categories/5
         [HttpDelete("{id}")]
         public IActionResult DeleteCategory(int id)
         {

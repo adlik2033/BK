@@ -22,7 +22,6 @@ namespace BK.Controllers
             _logger = logger;
         }
 
-        // GET: api/coupon
         [HttpGet]
         public ActionResult<IEnumerable<CouponDTO>> GetAllCoupons()
         {
@@ -39,7 +38,6 @@ namespace BK.Controllers
             }
         }
 
-        // GET: api/coupon/{id}
         [HttpGet("{id}")]
         public ActionResult<CouponDTO> GetCouponById(int id)
         {
@@ -61,7 +59,6 @@ namespace BK.Controllers
             }
         }
 
-        // GET: api/coupon/{id}/with-items
         [HttpGet("{id}/with-items")]
         public ActionResult<CouponWithItemsDTO> GetCouponWithItems(int id)
         {
@@ -87,8 +84,6 @@ namespace BK.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
-
-        // POST: api/coupon
         [HttpPost]
         public ActionResult<CouponDTO> CreateCoupon([FromBody] CreateCouponDTO createCouponDTO)
         {
@@ -124,7 +119,6 @@ namespace BK.Controllers
             }
         }
 
-        // PUT: api/coupon/{id}
         [HttpPut("{id}")]
         public ActionResult<CouponDTO> UpdateCoupon(int id, [FromBody] UpdateCouponDTO updateCouponDTO)
         {
@@ -146,18 +140,15 @@ namespace BK.Controllers
                     return NotFound($"Coupon with ID {id} not found");
                 }
 
-                // Validate business rules
                 var validationResult = ValidateCouponUpdate(updateCouponDTO, existingCoupon);
                 if (!validationResult.IsValid)
                 {
                     return BadRequest(validationResult.ErrorMessage);
                 }
 
-                // Update properties using mapper
                 _mapper.Map(updateCouponDTO, existingCoupon);
                 existingCoupon.UpdatedAt = DateTime.UtcNow;
 
-                // Check if coupon should be deactivated based on usage
                 if (existingCoupon.UsageCount >= existingCoupon.UsageLimit)
                 {
                     existingCoupon.IsActive = false;
@@ -175,7 +166,7 @@ namespace BK.Controllers
             }
         }
 
-        // POST: api/coupon/{id}/items
+
         [HttpPost("{id}/items")]
         public ActionResult<CouponWithItemsDTO> AddItemsToCoupon(int id, [FromBody] AddItemsToCouponDTO addItemsDTO)
         {
@@ -204,7 +195,6 @@ namespace BK.Controllers
             }
         }
 
-        // DELETE: api/coupon/{id}/items
         [HttpDelete("{id}/items")]
         public ActionResult<CouponWithItemsDTO> RemoveAllItemsFromCoupon(int id)
         {
@@ -233,7 +223,6 @@ namespace BK.Controllers
             }
         }
 
-        // DELETE: api/coupon/{id}/items/{itemId}
         [HttpDelete("{id}/items/{itemId}")]
         public ActionResult<CouponWithItemsDTO> RemoveItemFromCoupon(int id, int itemId)
         {
@@ -262,7 +251,7 @@ namespace BK.Controllers
             }
         }
 
-        // DELETE: api/coupon/{id}
+
         [HttpDelete("{id}")]
         public IActionResult DeleteCoupon(int id)
         {
@@ -288,8 +277,6 @@ namespace BK.Controllers
             }
         }
 
-        // Остальные методы (deactivate, activate, apply, etc.) остаются без изменений
-        // PATCH: api/coupon/{id}/deactivate
         [HttpPatch("{id}/deactivate")]
         public ActionResult<CouponDTO> DeactivateCoupon(int id)
         {
@@ -321,7 +308,6 @@ namespace BK.Controllers
             }
         }
 
-        // GET: api/coupon/active
         [HttpGet("active")]
         public ActionResult<IEnumerable<CouponDTO>> GetActiveCoupons()
         {
@@ -338,7 +324,6 @@ namespace BK.Controllers
             }
         }
 
-        // Helper methods for validation (остаются без изменений)
         private ValidationResult ValidateCoupon(CreateCouponDTO coupon)
         {
             if (string.IsNullOrWhiteSpace(coupon.Code))
@@ -429,7 +414,6 @@ namespace BK.Controllers
         // ... остальные методы
     }
 
-    // Helper classes (остаются без изменений)
     public class ValidationResult
     {
         public bool IsValid { get; set; }

@@ -27,7 +27,7 @@ namespace BK.Controllers
             {
                 Id = item.Id,
                 Name = item.Name,
-                Description = item.Description, // Используем свойство из модели
+                Description = item.Description, 
                 Price = item.Price,
                 CategoryId = item.CategoryId,
                 Category = new CategorySimpleDTO
@@ -41,7 +41,6 @@ namespace BK.Controllers
             return Ok(itemDTOs);
         }
 
-        // GET: api/items/5
         [HttpGet("{id}")]
         public ActionResult<ItemDTO> GetItem(int id)
         {
@@ -70,7 +69,6 @@ namespace BK.Controllers
             return Ok(itemDTO);
         }
 
-        // POST: api/items
         [HttpPost]
         public ActionResult<ItemDTO> CreateItem(CreateItemDTO createItemDTO)
         {
@@ -116,7 +114,6 @@ namespace BK.Controllers
             return CreatedAtAction(nameof(GetItem), new { id = itemDTO.Id }, itemDTO);
         }
 
-        // PUT: api/items/5
         [HttpPut("{id}")]
         public IActionResult UpdateItem(int id, UpdateItemDTO updateItemDTO)
         {
@@ -153,7 +150,6 @@ namespace BK.Controllers
             return NoContent();
         }
 
-        // DELETE: api/items/5
         [HttpDelete("{id}")]
         public IActionResult DeleteItem(int id)
         {

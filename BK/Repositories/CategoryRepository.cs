@@ -39,14 +39,14 @@ namespace BK.Repositories
         public IEnumerable<Category> GetAll()
         {
             return _context.Categories
-                .Include(c => c.Items) // Включаем Items для маппинга
+                .Include(c => c.Items) 
                 .ToList();
         }
 
         public Category GetById(int id)
         {
             return _context.Categories
-                .Include(c => c.Items) // Включаем Items для маппинга
+                .Include(c => c.Items) 
                 .FirstOrDefault(x => x.Id == id);
         }
 
@@ -57,7 +57,6 @@ namespace BK.Repositories
             return entity;
         }
 
-        // Дополнительный метод для получения активных категорий
         public IEnumerable<Category> GetActiveCategories()
         {
             return _context.Categories

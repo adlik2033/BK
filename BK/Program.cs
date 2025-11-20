@@ -22,7 +22,6 @@ namespace BK
 
             builder.Services.AddDbContext<BKDbContext>(options =>
              options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection")));
-            // Добавьте эту строку после builder.Services.AddControllers();
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
             builder.Services.AddScoped<ICouponRepository, CouponRepository>();
