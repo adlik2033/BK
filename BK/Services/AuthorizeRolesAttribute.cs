@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BK.Models.DTO;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace BK.Attributes
@@ -32,11 +33,5 @@ namespace BK.Attributes
                 return;
             }
         }
-    }
-
-    public class ErrorResponse
-    {
-        public string Error { get; set; } = string.Empty;
-        public string Details { get; set; } = string.Empty;
     }
 }

@@ -73,21 +73,6 @@ namespace BK.Mappings
                 .ForMember(dest => dest.Items, opt => opt.Ignore());
 
             // Order mappings
-            CreateMap<Order, OrderUserDTO>();
-            CreateMap<Order, OrderManagerDTO>();
-            CreateMap<Order, OrderAdminDTO>();
-            CreateMap<CreateOrderDTO, Order>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.OrderNumber, opt => opt.Ignore())
-                .ForMember(dest => dest.TotalAmount, opt => opt.Ignore())
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "Создан"))
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
-                .ForMember(dest => dest.Items, opt => opt.Ignore())
-                .ForMember(dest => dest.Coupons, opt => opt.Ignore())
-                .ForMember(dest => dest.User, opt => opt.Ignore());
-
-            // Order mappings
             CreateMap<Order, OrderUserDTO>()
                 .ForMember(dest => dest.Coupons, opt => opt.MapFrom(src => src.Coupons))
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.Items));
@@ -115,6 +100,17 @@ namespace BK.Mappings
                     Role = src.User.Role.Name,
                     CreatedAt = src.User.CreatedAt
                 } : null));
+
+            CreateMap<CreateOrderDTO, Order>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.OrderNumber, opt => opt.Ignore())
+                .ForMember(dest => dest.TotalAmount, opt => opt.Ignore())
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => "Создан"))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.Items, opt => opt.Ignore())
+                .ForMember(dest => dest.Coupons, opt => opt.Ignore())
+                .ForMember(dest => dest.User, opt => opt.Ignore());
         }
     }
 }

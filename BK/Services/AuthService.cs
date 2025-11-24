@@ -54,67 +54,73 @@ namespace BK.Services
 
         public AuthResponseDTO Register(RegisterRequestDTO registerDto)
         {
-            if (string.IsNullOrWhiteSpace(registerDto.Login) || string.IsNullOrWhiteSpace(registerDto.Email))
+            try
             {
-                throw new ArgumentException("Логин и email обязательны для заполнения");
-            }
-
-            if (string.IsNullOrWhiteSpace(registerDto.Password) || registerDto.Password.Length < 6)
-            {
-                throw new ArgumentException("Пароль должен содержать минимум 6 символов");
-            }
-
-            var existingUser = _userRepository.GetUserByLoginOrEmail(registerDto.Login);
-            if (existingUser != null)
-            {
-                throw new ArgumentException("Пользователь с таким логином уже существует");
-            }
-
-            existingUser = _userRepository.GetUserByLoginOrEmail(registerDto.Email);
-            if (existingUser != null)
-            {
-                throw new ArgumentException("Пользователь с таким email уже существует");
-            }
-
-            var userRole = _userRepository.GetRoleByName(UserRoles.User);
-            if (userRole == null)
-            {
-                throw new ArgumentException("Роль пользователя не найдена");
-            }
-
-            var user = new User
-            {
-                Login = registerDto.Login.Trim(),
-                Email = registerDto.Email.Trim().ToLower(),
-                PasswordHash = HashPassword(registerDto.Password),
-                RoleId = userRole.Id,
-                CreatedAt = DateTime.UtcNow,
-                IsActive = true
-            };
-
-            var createdUser = _userRepository.AddUser(user);
-            var token = _jwtService.GenerateToken(createdUser);
-            var refreshToken = _jwtService.GenerateRefreshToken();
-            var expiry = DateTime.UtcNow.AddDays(7);
-
-            _userRepository.SaveRefreshToken(createdUser.Id, refreshToken, expiry);
-
-            return new AuthResponseDTO
-            {
-                Token = token,
-                RefreshToken = refreshToken,
-                Expiration = expiry,
-                User = new UserResponseDTO
+                if (string.IsNullOrWhiteSpace(registerDto.Login) || string.IsNullOrWhiteSpace(registerDto.Email))
                 {
-                    Id = createdUser.Id,
-                    Login = createdUser.Login,
-                    Email = createdUser.Email,
-                    Role = createdUser.Role.Name,
-                    CreatedAt = createdUser.CreatedAt
+                    throw new ArgumentException("Логин и email обязательны для заполнения");
                 }
-            };
-        }
 
+                if (string.IsNullOrWhiteSpace(registerDto.Password) || registerDto.Password.Length < 6)
+                {
+                    throw new ArgumentException("Пароль должен содержать минимум 6 символов");
+                }
+
+                var existingUser = _userRepository.GetUserByLoginOrEmail(registerDto.Login);
+                if (existingUser != null)
+                {
+                    throw new ArgumentException("Пользователь с таким логином уже существует");
+                }
+
+                existingUser = _userRepository.GetUserByLoginOrEmail(registerDto.Email);
+                if (existingUser != null)
+                {
+                    throw new ArgumentException("Пользователь с таким email уже существует");
+                }
+
+                var userRole = _userRepository.GetRoleById(3);
+                if (userRole == null)
+                {
+                    userRole = _userRepository.GetAllRoles().FirstOrDefault();
+                    if (userRole == null)
+                    {
+                        throw new ArgumentException("В системе нет ролей. Обратитесь к администратору.");
+                    }
+                }
+
+                var user = new User
+                {
+                    Login = registerDto.Login.Trim(),
+                    Email = registerDto.Email.Trim().ToLower(),
+                    PasswordHash = HashPassword(registerDto.Password),
+                    RoleId = userRole.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                var createdUser = _userRepository.AddUser(user);
+                var token = _jwtService.GenerateToken(createdUser);
+
+                return new AuthResponseDTO
+                {
+                    Token = token,
+                    RefreshToken = "",
+                    Expiration = DateTime.UtcNow.AddMinutes(60),
+                    User = new UserResponseDTO
+                    {
+                        Id = createdUser.Id,
+                        Login = createdUser.Login,
+                        Email = createdUser.Email,
+                        Role = createdUser.Role.Name,
+                        CreatedAt = createdUser.CreatedAt
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Ошибка регистрации: {ex.Message}");
+            }
+        }
         public AuthResponseDTO RefreshToken(RefreshTokenRequestDTO refreshRequest)
         {
             if (!_jwtService.ValidateToken(refreshRequest.Token))

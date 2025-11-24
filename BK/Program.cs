@@ -1,11 +1,12 @@
-using BK.Services;
-using BK.Repositories;
+using BK.Mappings;
 using BK.Models;
-using Microsoft.EntityFrameworkCore;
+using BK.Repositories;
+using BK.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using BK.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<BKDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreConnection")));
 
+// НОВАЯ НАСТРОЙКА AUTOMAPPER
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -46,6 +48,48 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<BKDbContext>();
+
+    context.Database.EnsureCreated();
+
+    if (!context.Roles.Any())
+    {
+        Console.WriteLine("Создание ролей...");
+
+        var roles = new List<Role>
+        {
+            new Role { Id = 1, Name = "Admin", Description = "Администратор системы" },
+            new Role { Id = 2, Name = "Manager", Description = "Менеджер" },
+            new Role { Id = 3, Name = "User", Description = "Пользователь" }
+        };
+
+        context.Roles.AddRange(roles);
+        context.SaveChanges();
+        Console.WriteLine("Роли успешно созданы");
+    }
+
+    if (!context.Users.Any(u => u.RoleId == 1))
+    {
+        Console.WriteLine("Создание администратора...");
+
+        var adminUser = new User
+        {
+            Login = "admin",
+            Email = "admin@burgerking.com",
+            PasswordHash = HashPassword("admin123"),
+            RoleId = 1,
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
+        };
+
+        context.Users.Add(adminUser);
+        context.SaveChanges();
+        Console.WriteLine("Администратор создан: admin / admin123");
+    }
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -58,3 +102,11 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+string HashPassword(string password)
+{
+    using var sha256 = System.Security.Cryptography.SHA256.Create();
+    var bytes = System.Text.Encoding.UTF8.GetBytes(password);
+    var hash = sha256.ComputeHash(bytes);
+    return Convert.ToBase64String(hash);
+}
