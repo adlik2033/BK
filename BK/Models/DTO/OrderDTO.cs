@@ -17,8 +17,6 @@
         public int OrderNumber { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
         public UserResponseDTO? User { get; set; }
         public List<ItemUserDTO> Items { get; set; } = new List<ItemUserDTO>();
         public List<CouponUserDTO> Coupons { get; set; } = new List<CouponUserDTO>();

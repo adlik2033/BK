@@ -179,63 +179,6 @@ namespace BK.Controllers
             }
         }
 
-        [HttpPatch("{id}/toggle")]
-        [AuthorizeRoles(UserRoles.Admin)]
-        public ActionResult<ApiResponse<CategoryAdminDTO>> ToggleCategory(int id)
-        {
-            try
-            {
-                if (!_categoryRepository.Exists(id))
-                {
-                    return NotFound(new ErrorResponse { Error = "Ошибка", Details = "Категория не найдена" });
-                }
-
-                var existingCategory = _categoryRepository.GetById(id);
-                if (existingCategory == null)
-                {
-                    return NotFound(new ErrorResponse { Error = "Ошибка", Details = "Категория не найдена" });
-                }
-
-                existingCategory.IsActive = !existingCategory.IsActive;
-                existingCategory.UpdateAt = DateTime.UtcNow;
-
-                var updatedCategory = _categoryRepository.Update(existingCategory);
-
-                var categoryDTO = new CategoryAdminDTO
-                {
-                    Id = updatedCategory.Id,
-                    Name = updatedCategory.Name,
-                    Description = updatedCategory.Description,
-                    IsActive = updatedCategory.IsActive,
-                    CreatedAt = updatedCategory.CreatedAt,
-                    UpdateAt = updatedCategory.UpdateAt,
-                    Items = updatedCategory.Items.Select(i => new ItemUserDTO
-                    {
-                        Id = i.Id,
-                        Name = i.Name,
-                        Description = i.Description,
-                        Price = i.Price,
-                        Category = new CategorySimpleDTO
-                        {
-                            Id = updatedCategory.Id,
-                            Name = updatedCategory.Name,
-                            Description = updatedCategory.Description
-                        }
-                    }).ToList()
-                };
-
-                return Ok(new ApiResponse<CategoryAdminDTO>
-                {
-                    Success = true,
-                    Message = $"Категория успешно {(updatedCategory.IsActive ? "активирована" : "деактивирована")}",
-                    Data = categoryDTO
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ErrorResponse { Error = "Ошибка изменения статуса категории", Details = ex.Message });
-            }
-        }
 
         [HttpDelete("{id}")]
         [AuthorizeRoles(UserRoles.Admin)]

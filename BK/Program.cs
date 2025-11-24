@@ -88,7 +88,30 @@ using (var scope = app.Services.CreateScope())
         context.SaveChanges();
         Console.WriteLine("Администратор создан: admin / admin123");
     }
+
+    if (!context.Users.Any(u => u.RoleId == 2))
+    {
+        Console.WriteLine("Создание менеджера...");
+
+        var adminUser = new User
+        {
+            Login = "ms",
+            Email = "ms@burgerking.com",
+            PasswordHash = HashPassword("ms123"),
+            RoleId = 1,
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
+        };
+
+        context.Users.Add(adminUser);
+        context.SaveChanges();
+        Console.WriteLine("Администратор создан: admin / admin123");
+        Console.WriteLine("Менеджер создан: ms / ms123");
+    }
 }
+
+
+
 
 if (app.Environment.IsDevelopment())
 {

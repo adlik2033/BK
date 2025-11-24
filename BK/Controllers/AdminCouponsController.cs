@@ -168,7 +168,7 @@ namespace BK.Controllers
                     return NotFound(new ErrorResponse { Error = "Ошибка", Details = "Купон не найден" });
                 }
 
-                // Проверка уникальности кода (исключая текущий купон)
+                // Проверка уникальности кода исключая текущий купон
                 var existingCodeCoupon = _couponRepository.GetByCode(updateCouponDTO.Code);
                 if (existingCodeCoupon != null && existingCodeCoupon.Id != id)
                 {
@@ -236,76 +236,6 @@ namespace BK.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new ErrorResponse { Error = "Ошибка обновления купона", Details = ex.Message });
-            }
-        }
-
-        [HttpPatch("{id}/dates")]
-        [AuthorizeRoles(UserRoles.Admin)]
-        public ActionResult<ApiResponse<CouponAdminDTO>> UpdateCouponDates(int id, [FromBody] UpdateCouponDatesDTO updateDatesDTO)
-        {
-            try
-            {
-                if (!_couponRepository.Exists(id))
-                {
-                    return NotFound(new ErrorResponse { Error = "Ошибка", Details = "Купон не найден" });
-                }
-
-                var existingCoupon = _couponRepository.GetById(id);
-                if (existingCoupon == null)
-                {
-                    return NotFound(new ErrorResponse { Error = "Ошибка", Details = "Купон не найден" });
-                }
-
-                if (updateDatesDTO.ValidUntil <= updateDatesDTO.ValidFrom)
-                {
-                    return BadRequest(new ErrorResponse { Error = "Ошибка", Details = "Дата окончания должна быть позже даты начала" });
-                }
-
-                existingCoupon.ValidFrom = updateDatesDTO.ValidFrom;
-                existingCoupon.ValidUntil = updateDatesDTO.ValidUntil;
-                existingCoupon.UpdatedAt = DateTime.UtcNow;
-
-                var updatedCoupon = _couponRepository.Update(existingCoupon);
-
-                var couponDTO = new CouponAdminDTO
-                {
-                    Id = updatedCoupon.Id,
-                    Code = updatedCoupon.Code,
-                    Description = updatedCoupon.Description,
-                    DiscountType = updatedCoupon.DiscountType,
-                    DiscountValue = updatedCoupon.DiscountValue,
-                    ValidFrom = updatedCoupon.ValidFrom,
-                    ValidUntil = updatedCoupon.ValidUntil,
-                    UsageLimit = updatedCoupon.UsageLimit,
-                    UsageCount = updatedCoupon.UsageCount,
-                    IsActive = updatedCoupon.IsActive,
-                    CreatedAt = updatedCoupon.CreatedAt,
-                    UpdatedAt = updatedCoupon.UpdatedAt,
-                    Items = updatedCoupon.Items.Select(i => new ItemUserDTO
-                    {
-                        Id = i.Id,
-                        Name = i.Name,
-                        Description = i.Description,
-                        Price = i.Price,
-                        Category = new CategorySimpleDTO
-                        {
-                            Id = i.Category.Id,
-                            Name = i.Category.Name,
-                            Description = i.Category.Description
-                        }
-                    }).ToList()
-                };
-
-                return Ok(new ApiResponse<CouponAdminDTO>
-                {
-                    Success = true,
-                    Message = "Срок действия купона успешно обновлен",
-                    Data = couponDTO
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ErrorResponse { Error = "Ошибка обновления сроков купона", Details = ex.Message });
             }
         }
 

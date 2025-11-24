@@ -191,58 +191,6 @@ namespace BK.Controllers
             }
         }
 
-        [HttpPatch("{id}/toggle")]
-        [AuthorizeRoles(UserRoles.Admin)]
-        public ActionResult<ApiResponse<ItemAdminDTO>> ToggleItem(int id)
-        {
-            try
-            {
-                if (!_itemRepository.Exists(id))
-                {
-                    return NotFound(new ErrorResponse { Error = "Ошибка", Details = "Товар не найден" });
-                }
-
-                var existingItem = _itemRepository.GetById(id);
-                if (existingItem == null)
-                {
-                    return NotFound(new ErrorResponse { Error = "Ошибка", Details = "Товар не найден" });
-                }
-
-                existingItem.IsActive = !existingItem.IsActive;
-                existingItem.UpdateAt = DateTime.UtcNow;
-
-                var updatedItem = _itemRepository.Update(existingItem);
-
-                var itemDTO = new ItemAdminDTO
-                {
-                    Id = updatedItem.Id,
-                    Name = updatedItem.Name,
-                    Description = updatedItem.Description,
-                    Price = updatedItem.Price,
-                    IsActive = updatedItem.IsActive,
-                    CreatedAt = updatedItem.CreatedAt,
-                    UpdateAt = updatedItem.UpdateAt,
-                    CategoryId = updatedItem.CategoryId,
-                    Category = new CategorySimpleDTO
-                    {
-                        Id = updatedItem.Category.Id,
-                        Name = updatedItem.Category.Name,
-                        Description = updatedItem.Category.Description
-                    }
-                };
-
-                return Ok(new ApiResponse<ItemAdminDTO>
-                {
-                    Success = true,
-                    Message = $"Товар успешно {(updatedItem.IsActive ? "активирован" : "деактивирован")}",
-                    Data = itemDTO
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new ErrorResponse { Error = "Ошибка изменения статуса товара", Details = ex.Message });
-            }
-        }
 
         [HttpDelete("{id}")]
         [AuthorizeRoles(UserRoles.Admin)]
