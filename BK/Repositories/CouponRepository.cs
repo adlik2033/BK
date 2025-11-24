@@ -36,12 +36,16 @@ namespace BK.Repositories
 
         public IEnumerable<Coupon> GetAll()
         {
-            return _context.Coupons.ToList();
+            return _context.Coupons
+                .Include(c => c.Items.Where(i => i.IsActive))
+                .ToList();
         }
 
         public Coupon GetById(int id)
         {
-            var coupon = _context.Coupons.FirstOrDefault(x => x.Id == id);
+            var coupon = _context.Coupons
+                .Include(c => c.Items.Where(i => i.IsActive))
+                .FirstOrDefault(x => x.Id == id);
             return coupon;
         }
 
@@ -52,7 +56,6 @@ namespace BK.Repositories
             return entity;
         }
 
-
         public Coupon GetByCode(string code)
         {
             return _context.Coupons.FirstOrDefault(x => x.Code == code);
@@ -62,6 +65,7 @@ namespace BK.Repositories
         {
             var now = DateTime.UtcNow;
             return _context.Coupons
+                .Include(c => c.Items.Where(i => i.IsActive))
                 .Where(x => x.IsActive &&
                            x.ValidFrom <= now &&
                            x.ValidUntil >= now &&
@@ -71,7 +75,7 @@ namespace BK.Repositories
         public Coupon GetByIdWithItems(int id)
         {
             return _context.Coupons
-                .Include(c => c.items)
+                .Include(c => c.Items.Where(i => i.IsActive))
                 .FirstOrDefault(x => x.Id == id);
         }
 
@@ -80,20 +84,20 @@ namespace BK.Repositories
             try
             {
                 var coupon = _context.Coupons
-                    .Include(c => c.items)
+                    .Include(c => c.Items)
                     .FirstOrDefault(c => c.Id == couponId);
 
                 if (coupon == null) return false;
 
                 var itemsToAdd = _context.Items
-                    .Where(i => itemIds.Contains(i.Id))
+                    .Where(i => itemIds.Contains(i.Id) && i.IsActive)
                     .ToList();
 
                 foreach (var item in itemsToAdd)
                 {
-                    if (!coupon.items.Any(i => i.Id == item.Id))
+                    if (!coupon.Items.Any(i => i.Id == item.Id))
                     {
-                        coupon.items.Add(item);
+                        coupon.Items.Add(item);
                     }
                 }
 
@@ -112,12 +116,12 @@ namespace BK.Repositories
             try
             {
                 var coupon = _context.Coupons
-                    .Include(c => c.items)
+                    .Include(c => c.Items)
                     .FirstOrDefault(c => c.Id == couponId);
 
                 if (coupon == null) return false;
 
-                coupon.items.Clear();
+                coupon.Items.Clear();
                 coupon.UpdatedAt = DateTime.UtcNow;
                 _context.SaveChanges();
                 return true;
@@ -133,15 +137,15 @@ namespace BK.Repositories
             try
             {
                 var coupon = _context.Coupons
-                    .Include(c => c.items)
+                    .Include(c => c.Items)
                     .FirstOrDefault(c => c.Id == couponId);
 
                 if (coupon == null) return false;
 
-                var itemToRemove = coupon.items.FirstOrDefault(i => i.Id == itemId);
+                var itemToRemove = coupon.Items.FirstOrDefault(i => i.Id == itemId);
                 if (itemToRemove != null)
                 {
-                    coupon.items.Remove(itemToRemove);
+                    coupon.Items.Remove(itemToRemove);
                     coupon.UpdatedAt = DateTime.UtcNow;
                     _context.SaveChanges();
                     return true;

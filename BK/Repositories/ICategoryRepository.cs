@@ -10,6 +10,6 @@ namespace BK.Repositories
         Category Update(Category entity);
         bool Delete(int id);
         bool Exists(int id);
-        IEnumerable<Category> GetActiveCategories(); // Добавляем новый метод
+        IEnumerable<Category> GetActiveCategories();
     }
 }

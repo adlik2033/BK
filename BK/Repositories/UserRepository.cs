@@ -18,8 +18,7 @@ namespace BK.Repositories
         }
         public bool DeleteUser(int id)
         {
-            var user = _context.Users.FirstOrDefault(u =>
-            u.Id == id);
+            var user = _context.Users.FirstOrDefault(u => u.Id == id);
             if (user != null)
             {
                 _context.Users.Remove(user);
@@ -30,35 +29,38 @@ namespace BK.Repositories
 
         }
 
-        public User ExistUser(string loginOrEmail)
+        public User GetUserByLoginOrEmail(string loginOrEmail)
         {
             var user = _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefault(u =>
-            u.Login == loginOrEmail ||
-            u.Email == loginOrEmail);
+                .FirstOrDefault(u => u.Login == loginOrEmail || u.Email == loginOrEmail);
 
             return user;
         }
 
         public User GetUserById(int id)
         {
-            var user = _context.Users.FirstOrDefault(u =>
-            u.Id == id);
+            var user = _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.Id == id);
             if (user != null)
                 return user;
             else return null;
         }
 
-        public Role? RoleExist(int id)
+        public Role GetRoleById(int id)
         {
             return _context.Roles.FirstOrDefault(u => u.Id == id);
         }
 
-        public User UpdateUser(int id, User user)
+        public Role GetRoleByName(string roleName)
         {
-            var user1 = _context.Users.FirstOrDefault(u =>
-            u.Id == id);
+            return _context.Roles.FirstOrDefault(r => r.Name == roleName);
+        }
+
+        public User UpdateUser(User user)
+        {
+            var user1 = _context.Users.FirstOrDefault(u => u.Id == user.Id);
             if (user1 != null)
             {
                 _context.Users.Update(user);
@@ -67,6 +69,52 @@ namespace BK.Repositories
             return user;
         }
 
+        public bool SaveRefreshToken(int userId, string refreshToken, DateTime expiry)
+        {
+            var user = _context.Users.Find(userId);
+            if (user == null) return false;
+
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiry = expiry;
+            user.UpdateAt = DateTime.UtcNow;
+            _context.SaveChanges();
+            return true;
+        }
+
+        public User GetUserByRefreshToken(string refreshToken)
+        {
+            return _context.Users
+                .Include(u => u.Role)
+                .FirstOrDefault(u => u.RefreshToken == refreshToken && u.RefreshTokenExpiry > DateTime.UtcNow);
+        }
+
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _context.Users.Include(u => u.Role).ToList();
+        }
+
+        public IEnumerable<Role> GetAllRoles()
+        {
+            return _context.Roles.ToList();
+        }
+
+        public Role CreateRole(Role role)
+        {
+            _context.Roles.Add(role);
+            _context.SaveChanges();
+            return role;
+        }
+
+        public bool DeleteRole(int id)
+        {
+            var role = _context.Roles.Find(id);
+            if (role != null)
+            {
+                _context.Roles.Remove(role);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
     }
 }
-

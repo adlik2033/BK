@@ -1,4 +1,5 @@
 ﻿using BK.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BK.Repositories
 {
@@ -35,12 +36,22 @@ namespace BK.Repositories
 
         public IEnumerable<Order> GetAll()
         {
-            return _context.Orders.ToList();
+            return _context.Orders
+                .Include(o => o.Items.Where(i => i.IsActive))
+                .Include(o => o.Coupons.Where(c => c.IsActive))
+                .Include(o => o.User)
+                .ThenInclude(u => u.Role)
+                .ToList();
         }
 
         public Order GetById(int id)
         {
-            var order = _context.Orders.FirstOrDefault(x => x.Id == id);
+            var order = _context.Orders
+                .Include(o => o.Items.Where(i => i.IsActive))
+                .Include(o => o.Coupons.Where(c => c.IsActive))
+                .Include(o => o.User)
+                .ThenInclude(u => u.Role)
+                .FirstOrDefault(x => x.Id == id);
             return order;
         }
 
@@ -49,6 +60,55 @@ namespace BK.Repositories
             _context.Orders.Update(entity);
             _context.SaveChanges();
             return entity;
+        }
+
+        public IEnumerable<Order> GetUserOrders(int userId)
+        {
+            return _context.Orders
+                .Include(o => o.Items.Where(i => i.IsActive))
+                .Include(o => o.Coupons.Where(c => c.IsActive))
+                .Where(o => o.UserId == userId)
+                .ToList();
+        }
+
+        public IEnumerable<Order> GetOrdersByStatus(string status)
+        {
+            return _context.Orders
+                .Include(o => o.Items.Where(i => i.IsActive))
+                .Include(o => o.Coupons.Where(c => c.IsActive))
+                .Include(o => o.User)
+                .ThenInclude(u => u.Role)
+                .Where(o => o.Status == status)
+                .ToList();
+        }
+
+        public Order CreateOrder(Order order, List<int> itemIds, List<int> couponIds)
+        {
+            using var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                var lastOrder = _context.Orders.OrderByDescending(o => o.OrderNumber).FirstOrDefault();
+                order.OrderNumber = lastOrder?.OrderNumber + 1 ?? 1000;
+
+                var items = _context.Items.Where(i => itemIds.Contains(i.Id) && i.IsActive).ToList();
+                order.Items = items;
+
+                var coupons = _context.Coupons.Where(c => couponIds.Contains(c.Id) && c.IsActive).ToList();
+                order.Coupons = coupons;
+
+                order.TotalAmount = items.Sum(i => i.Price) - coupons.Sum(c => c.DiscountValue);
+
+                _context.Orders.Add(order);
+                _context.SaveChanges();
+
+                transaction.Commit();
+                return order;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
     }
 }
